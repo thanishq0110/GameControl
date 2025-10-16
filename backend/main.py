@@ -42,15 +42,24 @@ app.add_middleware(
 )
 
 # Docker client
-# Clear DOCKER_HOST to avoid conflicts
-if 'DOCKER_HOST' in os.environ:
-    del os.environ['DOCKER_HOST']
-
+# Try to connect to Docker daemon via Unix socket
+docker_client = None
 try:
-    docker_client = docker.DockerClient(base_url='unix:///var/run/docker.sock')
+    # First, try auto-detection with from_env
+    docker_client = docker.from_env(timeout=10)
+    logger.info("Connected to Docker daemon")
 except DockerException as e:
     logger.error(f"Failed to connect to Docker: {e}")
-    docker_client = None
+    # Fallback: try explicit Unix socket
+    try:
+        docker_client = docker.DockerClient(
+            base_url='unix:///var/run/docker.sock',
+            timeout=10
+        )
+        logger.info("Connected to Docker daemon via explicit socket")
+    except Exception as e2:
+        logger.error(f"Failed to connect via explicit socket: {e2}")
+        docker_client = None
 
 # ==================== Models ====================
 
