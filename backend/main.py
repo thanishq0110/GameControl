@@ -43,7 +43,7 @@ app.add_middleware(
 
 # Docker client
 try:
-    docker_client = docker.from_env()
+    docker_client = docker.DockerClient(base_url='unix:///var/run/docker.sock')
 except DockerException as e:
     logger.error(f"Failed to connect to Docker: {e}")
     docker_client = None
