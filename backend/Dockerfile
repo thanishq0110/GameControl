@@ -4,7 +4,6 @@ WORKDIR /app
 
 # Install system dependencies including build tools for pydantic-core compilation
 RUN apt-get update && apt-get install -y \
-    docker.io \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 

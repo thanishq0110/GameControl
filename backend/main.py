@@ -42,8 +42,15 @@ app.add_middleware(
 )
 
 # Docker client
+# Clear DOCKER_HOST to avoid conflicts with docker.io installation
+if 'DOCKER_HOST' in os.environ:
+    del os.environ['DOCKER_HOST']
+
 try:
-    docker_client = docker.DockerClient(base_url='unix:///var/run/docker.sock')
+    docker_client = docker.DockerClient(
+        base_url='unix:///var/run/docker.sock',
+        use_docker_client_env=False
+    )
 except DockerException as e:
     logger.error(f"Failed to connect to Docker: {e}")
     docker_client = None
